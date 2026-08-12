@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+train_dataset.csv
+*.csv
+models/*.joblib
+
+# ── 원본 작업 아카이브 (로컬 보관) ────────────────────────
+#   발표자료 PDF 는 slides/ 에 같은 파일이 있고(md5 동일),
+#   원본 노트북은 재분류돼 notebooks/ 로 들어가 있습니다.
+원본/
+
+# 노트북 체크포인트
+.ipynb_checkpoints/
