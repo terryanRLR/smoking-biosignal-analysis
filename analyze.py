@@ -7,7 +7,14 @@ from scipy import stats
 import statsmodels.formula.api as smf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RAW_PATH = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "train_dataset.csv")
+# 🔧 FIX(정리): 기본 탐색 경로에 data/ 를 추가.
+#   이 저장소의 데이터 배치 위치는 data/train_dataset.csv 인데
+#   기존 기본값은 저장소 루트만 봐서 인자 없이 실행하면 항상 실패했다.
+_CANDIDATES = [os.path.join(HERE, "data", "train_dataset.csv"),
+               os.path.join(HERE, "train_dataset.csv"),
+               os.path.join(HERE, "원본", "train_dataset.csv")]
+RAW_PATH = sys.argv[1] if len(sys.argv) > 1 else next(
+    (p for p in _CANDIDATES if os.path.exists(p)), _CANDIDATES[0])
 OUT_PATH = os.path.join(HERE, "dashboard_data.json")
 
 if not os.path.exists(RAW_PATH):
