@@ -33,10 +33,10 @@
    ============================================================ */
 :root{
   --bg:#EAEFEA; --surface:#FFFFFF; --surface-2:#E1EAE4;
-  --ink:#132420; --ink-muted:#4C6059; --ink-faint:#7C8F87;
+  --ink:#132420; --ink-muted:#4C6059; --ink-faint:#586962;
   --line:#C6D5CC; --line-strong:#9FB5A8;
   --accent:#146B5C; --accent-2:#0D4B40; --accent-soft:#DCEAE5;
-  --warn:#B5790F; --warn-soft:#F3E7CC;
+  --warn:#8C5C06; --warn-soft:#F3E7CC;
   --danger:#AE3527; --danger-soft:#F3DFDA;
   --nonsmoker:#5B6E66; --smoker:#AE3527;
   --grid-ecg: rgba(174,53,39,.10);
@@ -49,7 +49,7 @@
 }
 html.dark{
   --bg:#0D1613; --surface:#142420; --surface-2:#192E28;
-  --ink:#E9F1EC; --ink-muted:#9FB6AC; --ink-faint:#6C8177;
+  --ink:#E9F1EC; --ink-muted:#9FB6AC; --ink-faint:#869C92;
   --line:#25392F; --line-strong:#33493D;
   --accent:#43C7A6; --accent-2:#6FDBBE; --accent-soft:#16332B;
   --warn:#E5BC55; --warn-soft:#332A14;
@@ -77,7 +77,7 @@ body{
 .num{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
 
 a{color:var(--accent);}
-.skip-nav{position:absolute; top:-100px; left:8px; z-index:1000; background:var(--accent); color:#fff; font-weight:700; padding:10px 16px; border-radius:8px; text-decoration:none; transition:top .2s;}
+.skip-nav{position:absolute; top:-100px; left:8px; z-index:1000; background:#10231E; color:#fff; font-weight:700; padding:10px 16px; border-radius:8px; text-decoration:none; transition:top .2s;}
 .skip-nav:focus{top:8px;}
 :focus-visible{outline:2.5px solid var(--accent); outline-offset:3px; border-radius:4px;}
 
@@ -895,8 +895,11 @@ function initScrollSpy(){
     entries.forEach(e=>{
       if(e.isIntersecting){
         const idx = sections.indexOf(e.target);
-        buttons.forEach(b=>b.classList.remove('active'));
-        if(idx>-1) buttons[idx].classList.add('active');
+        /* 스크롤 위치가 바뀌면 '지금 보고 있는 섹션'을 스크린리더에도 알린다.
+     이 버튼들은 탭이 아니라 같은 페이지의 섹션으로 이동하는 내비게이션이므로
+     role="tab" 이 아니라 aria-current 가 맞다. */
+  buttons.forEach(b=>{ b.classList.remove('active'); b.removeAttribute('aria-current'); });
+        if(idx>-1){ buttons[idx].classList.add('active'); buttons[idx].setAttribute('aria-current','true'); }
       }
     });
   }, { rootMargin:'-40% 0px -50% 0px', threshold:0 });
