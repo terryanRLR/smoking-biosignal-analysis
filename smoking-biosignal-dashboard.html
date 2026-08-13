@@ -120,13 +120,16 @@ h1.title{
 
 /* 도장(판정) — 시그니처 요소 */
 .stamp-wrap{ width:132px; height:132px; flex:none; margin-top:6px;}
-.stamp{ animation:stamp-spin 70s linear infinite; }
+.stamp-rotor{ animation:stamp-spin 70s linear infinite; transform-box:fill-box; transform-origin:center; }
+@media (prefers-reduced-motion:reduce){ .stamp-rotor{ animation:none; } }
 @keyframes stamp-spin{ to{ transform:rotate(360deg);} }
 .stamp-ring-text{ font-family:var(--font-mono); font-size:8.4px; letter-spacing:.05em; fill:var(--stamp); }
 .stamp-core-bg{ fill:none; }
 .stamp-core-ring{ fill:none; stroke:var(--stamp); stroke-width:2.4; }
 .stamp-core-ring2{ fill:none; stroke:var(--stamp); stroke-width:1; }
 .stamp-center{ font-family:var(--font-display); font-weight:900; fill:var(--stamp); }
+.stamp-center-top{ font-size:19px; letter-spacing:.06em; }
+.stamp-center-btm{ font-size:25px; letter-spacing:.04em; }
 
 /* ECG 파형 배경 — 한 번 그려지고, 잠시 멈췄다가, 사라지고, 느리게 쉬었다 다시 그려짐
    ⚠ 그려지는 시간 / 멈춰있는 시간 / 사라지는 시간 / 쉬는 시간(초)은 여기서 바꾸는 게 아닙니다.
@@ -290,12 +293,20 @@ footer{ background:var(--surface-2); border-top:2px solid var(--ink); padding:36
     </div>
     <div class="stamp-wrap" aria-hidden="true">
       <svg class="stamp" viewBox="0 0 140 140" width="132" height="132">
-        <circle class="stamp-core-ring" cx="70" cy="70" r="62"/>
-        <circle class="stamp-core-ring2" cx="70" cy="70" r="54"/>
-        <path id="ringPath" d="M 70,70 m -46,0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0" fill="none"/>
-        <text class="stamp-ring-text">
-          <textPath href="#ringPath" startOffset="0%">· 가설 3건 검증 · 판독 완료 · SMOKING BIOSIGNAL REPORT </textPath>
-        </text>
+        <!-- 회전은 테두리와 둘레 글자에만 건다. 가운데 판정은 서 있어야 읽힌다. -->
+        <g class="stamp-rotor">
+          <circle class="stamp-core-ring" cx="70" cy="70" r="62"/>
+          <circle class="stamp-core-ring2" cx="70" cy="70" r="54"/>
+          <path id="ringPath" d="M 70,70 m -46,0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0" fill="none"/>
+          <text class="stamp-ring-text">
+            <textPath href="#ringPath" startOffset="0%">· 가설 3건 검증 · 판독 완료 · SMOKING BIOSIGNAL REPORT </textPath>
+          </text>
+        </g>
+        <!-- 검진결과지에서 도장은 판정이 찍히는 자리다. 그 자리가 비어 있어 장식으로만
+             읽혔다(.stamp-center 스타일은 이미 있었는데 쓰는 요소가 없었다).
+             가설 3건의 판독 결과가 '지지 · 지지 · 부분 지지' 이므로 소견 있음으로 찍는다. -->
+        <text class="stamp-center stamp-center-top" x="70" y="64" text-anchor="middle">소견</text>
+        <text class="stamp-center stamp-center-btm" x="70" y="92" text-anchor="middle">있음</text>
       </svg>
     </div>
     <svg class="ecg-line" viewBox="0 0 420 90" aria-hidden="true">
