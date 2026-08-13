@@ -104,7 +104,9 @@ header.masthead{
 }
 .theme-btn:hover{border-color:var(--accent); color:var(--accent);}
 
-.masthead-main{ padding:38px 0 30px; display:grid; grid-template-columns:1fr auto; gap:32px; align-items:start; position:relative;}
+/* padding 축약형을 쓰면 .wrap 의 좌우 16px 이 함께 지워진다(같은 요소에 두 클래스).
+   좁은 화면에서 히어로가 화면 끝에 붙고 도장이 잘리던 원인이라 세로만 지정한다. */
+.masthead-main{ padding-block:38px 30px; display:grid; grid-template-columns:1fr auto; gap:32px; align-items:start; position:relative;}
 .eyebrow{
   font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; color:var(--accent);
   text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:10px;
@@ -120,6 +122,9 @@ h1.title{
 
 /* 도장(판정) — 시그니처 요소 */
 .stamp-wrap{ width:132px; height:132px; flex:none; margin-top:6px;}
+/* SVG 에 width="132" 가 박혀 있어 모바일(76px)에서 컨테이너를 넘쳐 잘렸다.
+   컨테이너 크기를 따르게 한다 — 데스크톱은 132px 그대로다. */
+.stamp{ width:100%; height:auto; display:block; }
 .stamp-rotor{ animation:stamp-spin 70s linear infinite; transform-box:fill-box; transform-origin:center; }
 @media (prefers-reduced-motion:reduce){ .stamp-rotor{ animation:none; } }
 @keyframes stamp-spin{ to{ transform:rotate(360deg);} }
@@ -151,10 +156,15 @@ h1.title{
 nav.tabs{ position:sticky; top:0; z-index:40; background:var(--bg); border-bottom:1px solid var(--line); backdrop-filter:blur(6px);}
 nav.tabs .row{ display:flex; gap:6px; overflow-x:auto; padding:10px 0; scrollbar-width:none;}
 nav.tabs .row::-webkit-scrollbar{display:none;}
+nav.tabs::after{ content:''; position:absolute; top:0; right:0; bottom:0; width:46px;
+  background:linear-gradient(to right, transparent, var(--bg) 78%);
+  pointer-events:none; opacity:0; transition:opacity .2s; }
+nav.tabs.can-scroll::after{ opacity:1; }
+@media (prefers-reduced-motion:reduce){ nav.tabs::after{ transition:none; } }
 @media (max-width:640px){
   .masthead-top{ font-size:10px; }
   .masthead-top .wrap{ flex-wrap:wrap; gap:6px 10px; }
-  .masthead-main{ grid-template-columns:1fr; padding:28px 0 22px; gap:18px; }
+  .masthead-main{ grid-template-columns:1fr; padding-block:28px 22px; gap:18px; }
   .stamp-wrap{ width:76px; height:76px; justify-self:end; margin-top:4px; }
   .ecg-line{ display:none; }
   h1.title{ max-width:none; }
@@ -904,6 +914,23 @@ function initScrollSpy(){
     });
   }, { rootMargin:'-40% 0px -50% 0px', threshold:0 });
   sections.forEach(s=>s && io.observe(s));
+  /* 최상단에서는 어떤 섹션도 관찰 밴드(-40%~-50%)에 들어오지 않아 활성 표시가 아예 없었다.
+     데스크톱은 첫 화면이 짧아 금방 잡히지만 모바일에서는 계속 비어 보인다.
+     시작 지점의 현재 섹션은 첫 항목이므로 미리 켜 둔다. */
+  if(buttons[0] && !document.querySelector('.tab-btn.active')){
+    buttons[0].classList.add('active');
+    buttons[0].setAttribute('aria-current','true');
+  }
+  /* 탭바가 가로로 넘칠 때만 오른쪽에 페이드를 띄워 '더 있다'를 알린다.
+     스크롤바를 숨겨 둔 상태라(scrollbar-width:none) 힌트가 없으면 넘침을 알 수 없다. */
+  const row = document.getElementById('tabRow'), nav = row && row.closest('nav.tabs');
+  if(row && nav){
+    const upd = () => nav.classList.toggle('can-scroll',
+      row.scrollWidth - row.scrollLeft - row.clientWidth > 4);
+    upd();
+    row.addEventListener('scroll', upd, {passive:true});
+    addEventListener('resize', upd);
+  }
 }
 
 /* ---------------- 렌더 총괄 ---------------- */
